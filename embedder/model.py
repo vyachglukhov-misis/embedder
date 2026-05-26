@@ -3,6 +3,23 @@ import os
 from pathlib import Path
 
 import torch
+
+# ─── WORKAROUND ─────────────────────────────────────────────────────────────
+# В свежих transformers (>=4.49) AutoModel.from_pretrained проталкивает
+# kwarg `dtype` в `cls.__init__` через **model_kwargs, но XLMRobertaModel
+# его в сигнатуре не объявляет — падает TypeError. Накрываем монки-патчем
+# до того, как FlagEmbedding попробует поднять bge-m3.
+from transformers.models.xlm_roberta.modeling_xlm_roberta import XLMRobertaModel
+
+_orig_xlmr_init = XLMRobertaModel.__init__
+
+def _patched_xlmr_init(self, *args, **kwargs):
+    kwargs.pop('dtype', None)
+    return _orig_xlmr_init(self, *args, **kwargs)
+
+XLMRobertaModel.__init__ = _patched_xlmr_init
+# ────────────────────────────────────────────────────────────────────────────
+
 from FlagEmbedding import BGEM3FlagModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
