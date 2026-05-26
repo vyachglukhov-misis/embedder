@@ -1,6 +1,7 @@
-# Базовый образ: Python 3.11 + PyTorch 2.5.1 + CUDA 12.4 + cuDNN 9 (runtime).
-# torch с поддержкой GPU уже внутри — не переустанавливаем (иначе CPU-версия с PyPI всё сломает).
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+# Базовый образ: Python 3.11 + PyTorch 2.6.0 + CUDA 12.4 + cuDNN 9 (runtime).
+# torch >= 2.6 обязателен — иначе свежий transformers отказывается грузить чекпойнты
+# через torch.load (CVE-2025-32434). torch с GPU уже внутри — не переустанавливаем.
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 # git нужен FlagEmbedding/huggingface_hub для подтягивания весов с HF.
 RUN apt-get update \
