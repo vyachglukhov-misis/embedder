@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from FlagEmbedding import BGEM3FlagModel, FlagReranker
+from FlagEmbedding import BGEM3FlagModel, FlagLLMReranker
 
 CACHE_DIR = Path(os.getenv("HF_HOME", "./model_cache"))
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -21,14 +21,14 @@ def get_model() -> BGEM3FlagModel:
         print("Модель готова")
     return _model
 
-def get_reranker() -> FlagReranker:
+def get_reranker() -> FlagLLMReranker:
     global _reranker
     if _reranker is None:
-        print("Загружаем bge-reranker-v2-m3 на GPU...")
-        _reranker = FlagReranker(
-            'BAAI/bge-reranker-v2-m3',
+        print("Загружаем bge-reranker-v2-gemma на GPU...")
+        _reranker = FlagLLMReranker(
+            'BAAI/bge-reranker-v2-gemma',
             use_fp16=True,
-            device='cuda',
+            max_length=1024,  # код длиннее текста — увеличили с дефолтных 512
         )
         print("Реранкер готов")
     return _reranker
