@@ -1,0 +1,6 @@
+# torch==2.6.0+cu128
+FlagEmbedding
+fastapi
+uvicorn
+numpy
+pydantic
