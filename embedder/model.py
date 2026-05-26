@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from FlagEmbedding import BGEM3FlagModel, FlagReranker
 
-CACHE_DIR = Path("./model_cache")
-CACHE_DIR.mkdir(exist_ok=True)
+CACHE_DIR = Path(os.getenv("HF_HOME", "./model_cache"))
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 os.environ["HF_HOME"] = str(CACHE_DIR)
 
 _model = None

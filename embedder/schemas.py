@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class EmbedRequest(BaseModel):
     texts: list[str]
-    return_sparse: bool = True
+    return_sparse: bool = False
 
 class EmbedResponse(BaseModel):
     dense: list[list[float]]

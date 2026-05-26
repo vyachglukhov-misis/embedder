@@ -1,0 +1,29 @@
+# Скачанные веса — образ должен оставаться лёгким, веса монтируются томом.
+model_cache/
+
+# Python-кэш
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Виртуальные окружения, если вдруг есть в build context
+.venv/
+venv/
+env/
+
+# IDE / OS мусор
+.DS_Store
+.idea/
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Сам Dockerfile и .dockerignore в образ не нужны
+Dockerfile
+.dockerignore
+
+# Локальные .env (секреты не должны попасть в образ)
+.env
+.env.*
