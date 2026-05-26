@@ -1,9 +1,5 @@
 # torch==2.6.0+cu128 — теперь в базовом образе Docker
 FlagEmbedding
-# transformers >= 4.50 удалил tokenizer.prepare_for_model, который дёргает
-# FlagLLMReranker (decoder-only путь, bge-reranker-v2-gemma). Пиним на ветку,
-# где метод ещё существует. Внутри этого диапазона pip найдёт совместимое.
-transformers<4.50.0
 fastapi
 uvicorn
 numpy
