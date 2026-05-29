@@ -13,18 +13,21 @@ def get_model() -> SentenceTransformer:
     """
     Ленивая загрузка модели bge-multilingual-gemma2.
 
-    Загружаем сразу в fp16 через model_kwargs — это критично для VRAM:
-    fp32 потребовал бы ~36 ГБ при загрузке, fp16 — ~18 ГБ.
-    Для Gemma2 передача torch_dtype безопасна (баг с dtype был только
-    у XLM-RoBERTa в реранкере).
+    torch_dtype=float16  — загружаем сразу в fp16, не в fp32 (иначе нужно ~36 ГБ).
+    low_cpu_mem_usage=True — загружает слои сразу на GPU без промежуточного
+                             CPU-копирования. Критично для больших моделей на
+                             GPU с малым запасом VRAM (~22 ГБ из 24 ГБ).
     """
     global _model
     if _model is None:
-        print("Загружаем bge-multilingual-gemma2 на GPU (fp16)...")
+        print("Загружаем bge-multilingual-gemma2 на GPU (fp16, low_cpu_mem_usage)...")
         _model = SentenceTransformer(
             "BAAI/bge-multilingual-gemma2",
             device="cuda",
-            model_kwargs={"torch_dtype": torch.float16},
+            model_kwargs={
+                "torch_dtype": torch.float16,
+                "low_cpu_mem_usage": True,
+            },
         )
         dim = _model.get_sentence_embedding_dimension()
         print(f"Модель готова: dim={dim}")
