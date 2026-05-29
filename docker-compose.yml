@@ -1,8 +1,5 @@
 # Embedder: FastAPI + sentence-transformers + BAAI/bge-multilingual-gemma2.
-# 9B параметров, ~18 ГБ VRAM в fp16, 3584-dim вектора, мультиязычный.
-#
-# Первый запуск (сборка образа + скачивание весов): ~15–20 минут.
-# Последующие запуски (веса из ~/models-cache): ~1–2 минуты.
+# Запускается на GPU 0. Реранкер на GPU 1.
 #
 # Запуск: docker compose up -d --build
 # Логи:   docker compose logs -f
@@ -15,7 +12,8 @@ services:
     restart: unless-stopped
 
     environment:
-      # Снижает фрагментацию VRAM — критично когда свободно <1 ГБ
+      # Явно направляем на GPU 0
+      CUDA_VISIBLE_DEVICES: "0"
       PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
 
     deploy:
@@ -23,7 +21,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]
 
     ports:
