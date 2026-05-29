@@ -14,7 +14,10 @@ services:
     container_name: emb-svc
     restart: unless-stopped
 
-    # GPU-доступ. Требует nvidia-container-toolkit на хосте.
+    environment:
+      # Снижает фрагментацию VRAM — критично когда свободно <1 ГБ
+      PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+
     deploy:
       resources:
         reservations:
@@ -23,16 +26,12 @@ services:
               count: 1
               capabilities: [gpu]
 
-    # Слушаем только loopback VM — наружу через SSH-туннель с Mac.
     ports:
       - "127.0.0.1:8000:8000"
 
-    # Общий с reranker том под HF-кэш — веса не дублируются на диске.
     volumes:
       - ${HOME}/models-cache:/data
 
-    # Healthcheck: Docker будет знать, что модель ещё грузится.
-    # start_period=180s даёт время на загрузку 18 ГБ весов при первом старте.
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
