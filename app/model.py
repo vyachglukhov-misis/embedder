@@ -13,18 +13,19 @@ def get_model() -> SentenceTransformer:
     """
     Ленивая загрузка модели bge-multilingual-gemma2.
 
-    Загружаем в дефолтной precision, потом .half() — это обходит баг
-    transformers с передачей dtype в __init__ старых моделей (мы на нём
-    уже горели с FlagEmbedding/GemmaReranker).
+    Загружаем сразу в fp16 через model_kwargs — это критично для VRAM:
+    fp32 потребовал бы ~36 ГБ при загрузке, fp16 — ~18 ГБ.
+    Для Gemma2 передача torch_dtype безопасна (баг с dtype был только
+    у XLM-RoBERTa в реранкере).
     """
     global _model
     if _model is None:
-        print("Загружаем bge-multilingual-gemma2 на GPU...")
+        print("Загружаем bge-multilingual-gemma2 на GPU (fp16)...")
         _model = SentenceTransformer(
             "BAAI/bge-multilingual-gemma2",
             device="cuda",
+            model_kwargs={"torch_dtype": torch.float16},
         )
-        _model.half()  # fp16 после загрузки — не через torch_dtype в __init__
         dim = _model.get_sentence_embedding_dimension()
         print(f"Модель готова: dim={dim}")
     return _model
