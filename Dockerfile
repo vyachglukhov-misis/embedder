@@ -3,7 +3,7 @@
 # через torch.load (CVE-2025-32434). torch с GPU уже внутри — не переустанавливаем.
 FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
-# git нужен FlagEmbedding/huggingface_hub для подтягивания весов с HF.
+# git нужен sentence-transformers/huggingface_hub для подтягивания весов с HF.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
@@ -14,14 +14,13 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Затем код сервиса. Структура: <context>/embedder/{main,model,schemas}.py
-COPY embedder/ ./embedder/
+# Затем код сервиса (только app/).
+COPY app/ ./app/
 
-# Кэш моделей HuggingFace направляем на ПРИМОНТИРОВАННЫЙ том,
-# а не внутрь образа — иначе образ распухнет до ~10 ГБ.
-# model.py уважает эту переменную после правки.
-ENV HF_HOME=/data/hf
+# Кэш моделей HuggingFace направляем на примонтированный том ~/models-cache:/data.
+# app/model.py уважает HF_HOME и не пишет веса внутрь образа.
+ENV HF_HOME=/data
 
 EXPOSE 8000
 
-CMD ["uvicorn", "embedder.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
