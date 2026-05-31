@@ -1,5 +1,5 @@
 # Embedder: FastAPI + sentence-transformers + BAAI/bge-multilingual-gemma2.
-# Запускается на GPU 0. Реранкер также на GPU 0 (RTX 5090, 32 ГБ VRAM — места хватает).
+# Запускается на GPU 0. Реранкер на GPU 1.
 #
 # Запуск: docker compose up -d --build
 # Логи:   docker compose logs -f
